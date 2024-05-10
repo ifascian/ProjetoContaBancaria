@@ -16,9 +16,9 @@ public class Menu {
 		ContaController contas = new ContaController();
 		Scanner input = new Scanner(System.in);
 		
-		int opcao, numero, agencia, tipo, aniversario;
+		int opcao, numero, agencia, tipo, aniversario, numeroDestino;
 		String titular;
-		float saldo, limite;
+		float saldo, limite, valor;
 		
 		System.out.println("\nCriar Contas\n");
 		
@@ -28,7 +28,7 @@ public class Menu {
 		contas.cadastrar(cc2);
 		ContaPoupanca cp1 = new ContaPoupanca(contas.gerarNumero(), 125, 2, "Marina dos Santos", 4000f, 12);
 		contas.cadastrar(cp1);
-		ContaPoupanca cp2 = new ContaPoupanca(contas.gerarNumero(), 125, 2, "Juliana Ramos", 5000f, 15);
+		ContaPoupanca cp2 = new ContaPoupanca(contas.gerarNumero(), 125, 2, "Juliana Ramos", 8000f, 15);
 		contas.cadastrar(cp2);
 		contas.listarTodas();
 		
@@ -82,7 +82,7 @@ public class Menu {
 					tipo  = input.nextInt();
 				}while(tipo < 1 && tipo > 2);
 				
-				System.out.println("Digite saldo fa conta (R$): ");
+				System.out.println("Digite saldo da conta (R$): ");
 				saldo = input.nextFloat();
 				
 				switch(tipo) {
@@ -110,31 +110,126 @@ public class Menu {
 			case 3:
 				
 				System.out.println(Cores.TEXT_WHITE +"Consultar dados da conta\n\n");
+				
+				System.out.println("Digite o número da conta: ");
+				numero = input.nextInt();
+				
+				contas.procurarPorNumero(numero);
+				
+				keyPress();
 					break;
 				
 			case 4:	
 				
 				System.out.println(Cores.TEXT_WHITE + "Atualizar dados da conta\n\n");
+				
+				System.out.println("Digite o número da conta: ");
+				numero = input.nextInt();
+				
+				var buscaConta = contas.buscarNaCollection(numero);
+				
+				if(buscaConta != null) {
+					tipo = buscaConta.getTipo();
+					
+				System.out.println("Digite o número da Agência: ");
+					agencia = input.nextInt();
+					
+				System.out.println("Digite o nome do titular: ");
+				input.skip("\\R?");	
+				titular = input.nextLine();
+				
+				System.out.println("Digite saldo da conta (R$): ");
+				saldo = input.nextFloat();
+				
+				switch(tipo) {
+				
+					case 1 -> {
+						System.out.println("Digite o limite do crédito (R$): ");
+						limite = input.nextFloat();
+						
+						contas.atualizar(new ContaCorrente (numero, agencia, tipo, titular,saldo, limite));
+					}
+					case 2 -> {
+						System.out.println("Digite o dia do aniversário da conta: ");
+						aniversario = input.nextInt();
+						
+						contas.atualizar(new ContaPoupanca(numero, agencia, tipo, titular, saldo, aniversario) );
+					}
+					default -> {
+						System.out.println("Tipo de conta inválido!");
+					}
+						
+				}
+			}else {
+				System.out.println("A conta não foi encontrada!");
+			}
+				keyPress();
 					break;
 					
 			case 5:
 					
 				System.out.println(Cores.TEXT_WHITE + "Apagar conta\n\n");
+				
+				System.out.println("Digite o número da conta: ");
+				numero = input.nextInt();
+				
+				contas.deletar(numero);
+				
+				keyPress();
 					break;
 					
 			case 6:
 					
 				System.out.println(Cores.TEXT_WHITE + "Saque\n\n");
+				
+				System.out.println("Digite o número da conta: ");
+				numero = input.nextInt();
+				
+				do {
+					System.out.println("Digite o valor do saque (R$): ");
+					valor = input.nextFloat();
+				} while(valor <= 0);
+				
+				contas.sacar(numero, valor);
+				
+				keyPress();
 					break;
 				
 			case 7:	
 					
 				System.out.println(Cores.TEXT_WHITE + "Depósito\n\n");
+				
+				System.out.println("Digite o número da conta: ");
+				numero = input.nextInt();
+				
+				do {
+					System.out.println("Digite o valor do depósito (R$): ");
+					valor = input.nextFloat();
+				}while(valor <= 0);
+				
+				contas.depositar(numero, valor);
+				
+				keyPress();
 					break;
 					
 			case 8:	
 					
 				System.out.println(Cores.TEXT_WHITE + "transferência entre contas\n\n");
+				
+				System.out.println("Digite o número da conta de origem: ");
+				numero = input.nextInt();
+				
+				System.out.println("Digite o número da conta de destino: ");
+				numeroDestino = input.nextInt();
+				
+				do {
+					System.out.println("Digite o valor da transferência (R$): ");
+					valor = input.nextFloat();
+				}while(valor <= 0);
+				
+				contas.transferir(numero, numeroDestino, valor);
+				
+				keyPress();
 					break;
 					
 			default:
